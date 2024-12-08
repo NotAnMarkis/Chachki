@@ -287,7 +287,7 @@ void aimove() {
     int diag1mov[7][2], diag2mov[7][2];
     int a, b, ach, bch, bestmoveindiag1, bestmoveindiag2;
     int maxindiag1 = -1, maxindiag2 = -1, maxforall = -1;
-    int i, d, index;
+    int i, d, index, bestchance;
 
     for (i = 0; i < 12; i++) {
         teamchance[i] = -1;
@@ -310,72 +310,239 @@ void aimove() {
         }
         //{0,1}, {0,3}, {0,5}, {0,7}, {1,0}, {1,2}, {1,4}, {1,6}, {2,1}, {2,3}, {2,5}, {2,7}
         if (deskinfo[a][b] == 1) {
-            // Check all possible moves for regular pieces {1,0}
-            if (b + 1 == 8 && (deskinfo[a + 1][b - 1] == 1 || deskinfo[a + 1][b - 1] == 3)) {
+            if (a + 1 < 8 && b - 1 == -1 && (deskinfo[a + 1][b + 1] == 1 || deskinfo[a + 1][b + 1] == 3)) {
                 teamchance[i] = 0;
                 continue;
             }
-            else if (b - 1 == -1 && (deskinfo[a + 1][b + 1] == 1 || deskinfo[a + 1][b + 1] == 3)) {
+            else if (a + 1 < 8 && b + 1 == 8 && (deskinfo[a + 1][b - 1] == 1 || deskinfo[a + 1][b - 1] == 3)) {
                 teamchance[i] = 0;
                 continue;
             }
-            else if ((deskinfo[a + 1][b + 1] == 1 || deskinfo[a + 1][b + 1] == 3) && (deskinfo[a + 1][b - 1] == 1 || deskinfo[a + 1][a - 1] == 3)) {
+            else if (a + 1 < 8 && (deskinfo[a + 1][b + 1] == 1 || deskinfo[a + 1][b + 1] == 3) && (deskinfo[a + 1][b - 1] == 1 || deskinfo[a + 1][b - 1] == 3)) {
                 teamchance[i] = 0;
                 continue;
             }
-            else if (deskinfo[a + 1][b - 1] == 0) {
+            else if (a + 1 < 8 && b + 1 == 8 && deskinfo[a + 1][b - 1] == 0) {
                 ach = a + 1;
                 bch = b - 1;
+                if (ach == 7 && deskinfo[ach][bch] == 0) {
+                    if (teamchance[i] < 60) {
+                        teamchance[i] = 60;
+                        bestmoveindex[i][0] = ach;
+                        bestmoveindex[i][1] = bch;
+                    }
+                }
+                if (deskinfo[ach + 1][bch + 1] == 0 && deskinfo[ach + 1][bch - 1] == 0) {
+                    if (teamchance[i] < 20) {
+                        teamchance[i] = 20;
+                        bestmoveindex[i][0] = ach;
+                        bestmoveindex[i][1] = bch;
+                    }
+                }
+                else if ((deskinfo[ach + 1][bch + 1] == 2 || deskinfo[ach + 1][bch + 1] == 4) && (deskinfo[ach - 1][bch - 1] == 1 || deskinfo[ach - 1][bch - 1] == 3)) {
+                    if (teamchance[i] < 15) {
+                        teamchance[i] = 15;
+                        bestmoveindex[i][0] = ach;
+                        bestmoveindex[i][1] = bch;
+                    }
+                }
+                else if (deskinfo[ach + 1][bch - 1] == 2 || deskinfo[ach + 1][bch - 1]) {
+                    if (teamchance[i] < 10) {
+                        teamchance[i] = 10;
+                        bestmoveindex[i][0] = ach;
+                        bestmoveindex[i][1] = bch;
+                    }
+                }
+            }
+            else if (a + 1 < 8 && b + 1 == 8 && (deskinfo[a + 1][b - 1] == 2 || deskinfo[a + 1][b - 1] == 4)) {
+                ach = a + 1;
+                bch = b - 1;
+                if (ach + 1 < 8 && (deskinfo[ach + 1][bch + 1] == 2 || deskinfo[ach][bch] == 4 || deskinfo[ach + 1][bch - 1] == 1 || deskinfo[ach + 1][bch - 1] == 3)) {
+                    teamchance[i] = 0;
+                    continue;
+                }
+                else if (ach + 1 < 8 && (deskinfo[ach + 1][bch - 1] == 0)) {
+                    ach++;
+                    bch--;
+                    if (ach + 1 == 8) {
+                        teamchance[i] = 100;
+                        bestmoveindex[i][0] = ach;
+                        bestmoveindex[i][1] = ach;
+                    }
+                    else if ((deskinfo[ach + 1][bch - 1] == 1 || deskinfo[ach + 1][bch - 1] == 3 || deskinfo[ach + 1][bch - 1] == 0) && (deskinfo[ach + 1][bch + 1] == 1 || deskinfo[ach + 1][bch + 1] == 3 || deskinfo[ach + 1][bch + 1] == 0) || ((deskinfo[ach + 1][bch - 1] == 0 || deskinfo[ach + 1][bch - 1] == 1 || deskinfo[ach + 1][bch - 1] == 3) && (deskinfo[ach + 1][bch + 1] == 2 && deskinfo[ach + 1][bch + 1] == 4) && (deskinfo[ach - 1][bch - 1] == 1 || deskinfo[ach - 1][bch - 1] == 3))) {
+                        if (teamchance[i] < 95) {
+                            teamchance[i] = 95;
+                            bestmoveindex[i][0] = ach;
+                            bestmoveindex[i][1] = bch;
+                        }
+                    }
+                    else if ((deskinfo[ach + 1][bch - 1] == 2 || deskinfo[ach + 1][bch - 1] == 4) || ((deskinfo[ach + 1][bch + 1] == 2 || deskinfo[ach + 1][bch + 1] == 4) && deskinfo[ach - 1][bch - 1] == 0)) {
+                        if (teamchance[i] < 80) {
+                            teamchance[i] = 80;
+                            bestmoveindex[i][0] = ach;
+                            bestmoveindex[i][1] = bch;
+                        }
+                    }
+                }
+            }
+            else if (a + 1 < 8 && b - 1 == -1 && deskinfo[a + 1][b + 1] == 0) {
+                ach = a + 1;
+                bch = b + 1;
+                if (ach == 7 && deskinfo[ach][bch] == 0) {
+                    if (teamchance[i] < 60) {
+                        teamchance[i] = 60;
+                        bestmoveindex[i][0] = ach;
+                        bestmoveindex[i][1] = bch;
+                    }
+                }
                 if (deskinfo[ach + 1][bch - 1] == 0 && deskinfo[ach + 1][bch + 1] == 0) {
-                    teamchance[i] = 25;
+                    if (teamchance[i] < 40) {
+                        teamchance[i] = 20;
+                        bestmoveindex[i][0] = ach;
+                        bestmoveindex[i][1] = bch;
+                    }
                 }
-                else if ((deskinfo[ach + 1][bch - 1] == 2 && deskinfo[ach - 1][bch + 1] == 1 && deskinfo[ach + 1][bch + 1] == 0) || (deskinfo[ach + 1][bch + 1] == 2 && deskinfo[ach - 1][bch - 1] == 1 && deskinfo[ach + 1][bch - 1] == 0)) {
-                    teamchance[i] = 35;
+                else if ((deskinfo[ach + 1][bch - 1] == 2 || deskinfo[ach + 1][bch - 1] == 4) && (deskinfo[ach - 1][bch + 1] == 1 || deskinfo[ach - 1][bch + 1] == 3)) {
+                    if (teamchance[i] < 25) {
+                        teamchance[i] = 15;
+                        bestmoveindex[i][0] = ach;
+                        bestmoveindex[i][1] = bch;
+                    }
                 }
-                else if ((deskinfo[ach + 1][bch - 1] == 2 && deskinfo[ach - 1][bch + 1] == 0 && deskinfo[ach + 1][bch + 1] == 0) || (deskinfo[ach + 1][bch - 1] == 2 || deskinfo[ach + 1][bch - 1] == 0)) {
-                    teamchance[i] = 15;
-                }
-                bestmoveindex[i][0] = ach;
-                bestmoveindex[i][1] = bch;
-            }
-            else if (deskinfo[a + 1][b - 1] == 2 || deskinfo[a + 1][b - 1] == 4) {
-                if (deskinfo[a + 2][b - 2] == 0) {
-                    teamchance[i] = 90;
-                    bestmoveindex[i][0] = a + 2;
-                    bestmoveindex[i][1] = b - 2;
-                }
-            }
-            else if (deskinfo[a + 1][b + 1] == 2 || deskinfo[a + 1][b + 1] == 4) {
-                if (deskinfo[a + 2][b + 2] == 0) {
-                    teamchance[i] = 90;
-                    bestmoveindex[i][0] = a + 2;
-                    bestmoveindex[i][1] = b + 2;
+                else if (((deskinfo[ach + 1][bch + 1] == 2 || deskinfo[ach + 1][bch + 1] == 4) && deskinfo[ach-1][bch-1] == 0) || (deskinfo[ach+1][bch-1] == 2 || deskinfo[ach+1][bch-1] == 4)) {
+                    if (teamchance[i] < 10) {
+                        teamchance[i] = 10;
+                        bestmoveindex[i][0] = ach;
+                        bestmoveindex[i][1] = bch;
+                    }
                 }
             }
-            else if (a + 1 == 7) {
-                if (deskinfo[a + 1][b - 1] == 0) {
-                    teamchance[i] = 75;
-                    bestmoveindex[i][0] = a + 1;
-                    bestmoveindex[i][1] = b - 1;
+            else if (a + 1 < 8 && b - 1 == -1 && (deskinfo[a + 1][b + 1] == 2 || deskinfo[a + 1][b + 1] == 4)) {
+                ach = a + 1;
+                bch = b + 1;
+                if (ach + 1 < 8 && (deskinfo[ach + 1][bch - 1] == 2 || deskinfo[ach][bch] == 4 || deskinfo[ach + 1][bch + 1] == 1 || deskinfo[ach + 1][bch + 1] == 3)) {
+                    teamchance[i] = 0;
+                    continue;
                 }
-                else if (deskinfo[a + 1][b + 1] == 0) {
-                    teamchance[i] = 75;
-                    bestmoveindex[i][0] = a + 1;
-                    bestmoveindex[i][1] = b + 1;
+                else if (ach + 1 < 8 && (deskinfo[ach + 1][bch + 1] == 0)) {
+                    ach++;
+                    bch++;
+                    if (ach + 1 == 8) {
+                        teamchance[i] = 100;
+                        bestmoveindex[i][0] = ach;
+                        bestmoveindex[i][1] = ach;
+                    }
+                    else if ((deskinfo[ach + 1][bch + 1] == 1 || deskinfo[ach + 1][bch + 1] == 3 || deskinfo[ach + 1][bch + 1] == 0) && (deskinfo[ach + 1][bch - 1] == 1 || deskinfo[ach + 1][bch - 1] == 3 || deskinfo[ach + 1][bch - 1] == 0) || ((deskinfo[ach + 1][bch + 1] == 0 || deskinfo[ach + 1][bch + 1] == 1 || deskinfo[ach + 1][bch + 1] == 3) && (deskinfo[ach + 1][bch - 1] == 2 && deskinfo[ach + 1][bch - 1] == 4) && (deskinfo[ach - 1][bch + 1] == 1 || deskinfo[ach - 1][bch + 1] == 3))) {
+                        if (teamchance[i] < 95) {
+                            teamchance[i] = 95;
+                            bestmoveindex[i][0] = ach;
+                            bestmoveindex[i][1] = bch;
+                        }
+                    }
+                    else if ((deskinfo[ach + 1][bch + 1] == 2 || deskinfo[ach + 1][bch + 1] == 4) || ((deskinfo[ach + 1][bch - 1] == 2 || deskinfo[ach + 1][bch - 1] == 4) && deskinfo[ach - 1][bch + 1] == 0)) {
+                        if (teamchance[i] < 80) {
+                            teamchance[i] = 80;
+                            bestmoveindex[i][0] = ach;
+                            bestmoveindex[i][1] = bch;
+                        }
+                    }
                 }
-            }
-            else if (b - 1 == 0) {
-                if (deskinfo[a + 1][b - 1] == 0) {
-                    teamchance[i] = 60;
-                    bestmoveindex[i][0] = a + 1;
-                    bestmoveindex[i][1] = b - 1;
-                }
-            }
-            else if (b + 1 == 7) {
-                if (deskinfo[a + 1][b + 1] == 0) {
-                    teamchance[i] = 60;
-                    bestmoveindex[i][0] = a + 1;
-                    bestmoveindex[i][1] = b + 1;
+                else if (a + 1 < 8 && b > 0 && b < 7) {
+                    if (deskinfo[a + 1][b + 1] == 0) {
+                        ach = a + 1;
+                        bch = b + 1;
+                        if (ach == 7 && deskinfo[ach][bch] == 0) {
+                            if (teamchance[i] < 60) {
+                                teamchance[i] = 60;
+                                bestmoveindex[i][0] = ach;
+                                bestmoveindex[i][1] = bch;
+                            }
+                        }
+                        else if (((deskinfo[ach + 1][bch + 1] == 2 || deskinfo[ach + 1][bch + 1] == 4) && (deskinfo[ach - 1][bch - 1] == 1 || deskinfo[ach - 1][bch - 1] == 3)) || ((deskinfo[ach + 1][bch - 1] == 2 || deskinfo[ach + 1][bch - 1] == 4) && (deskinfo[ach - 1][bch + 1] == 1 || deskinfo[ach - 1][bch + 1] == 3)) || (deskinfo[ach + 1][bch + 1] == 0 && deskinfo[ach + 1][bch - 1] == 0)) {
+                            if (teamchance[i] < 40) {
+                                teamchance[i] = 40;
+                                bestmoveindex[i][0] = ach;
+                                bestmoveindex[i][1] = bch;
+                            }
+                        }
+                        else if (((deskinfo[ach + 1][bch + 1] == 2 || deskinfo[ach + 1][bch + 1] == 4) && deskinfo[ach - 1][bch - 1] == 0) || ((deskinfo[ach + 1][bch - 1] == 2 || deskinfo[ach + 1][bch - 1] == 4) && deskinfo[ach - 1][bch + 1] == 0)) {
+                            if (teamchance[i] < 10) {
+                                teamchance[i] = 10;
+                                bestmoveindex[i][0] = ach;
+                                bestmoveindex[i][1] = bch;
+                            }
+                        }
+                    } else if (deskinfo[a + 1][b - 1] == 0) {
+                        ach = a + 1;
+                        bch = b - 1;
+                        if (ach == 7 && deskinfo[ach][bch] == 0) {
+                            if (teamchance[i] < 60) {
+                                teamchance[i] = 60;
+                                bestmoveindex[i][0] = ach;
+                                bestmoveindex[i][1] = bch;
+                            }
+                        }
+                        else if (((deskinfo[ach + 1][bch + 1] == 2 || deskinfo[ach + 1][bch + 1] == 4) && (deskinfo[ach - 1][bch - 1] == 1 || deskinfo[ach - 1][bch - 1] == 3)) || ((deskinfo[ach + 1][bch - 1] == 2 || deskinfo[ach + 1][bch - 1] == 4) && (deskinfo[ach - 1][bch + 1] == 1 || deskinfo[ach - 1][bch + 1] == 3)) || (deskinfo[ach + 1][bch + 1] == 0 && deskinfo[ach + 1][bch - 1] == 0)) {
+                            if (teamchance[i] < 40) {
+                                teamchance[i] = 40;
+                                bestmoveindex[i][0] = ach;
+                                bestmoveindex[i][1] = bch;
+                            }
+                        }
+                        else if (((deskinfo[ach + 1][bch + 1] == 2 || deskinfo[ach + 1][bch + 1] == 4) && deskinfo[ach - 1][bch - 1] == 0) || ((deskinfo[ach + 1][bch - 1] == 2 || deskinfo[ach + 1][bch - 1] == 4) && deskinfo[ach - 1][bch + 1] == 0)) {
+                            if (teamchance[i] < 10) {
+                                teamchance[i] = 10;
+                                bestmoveindex[i][0] = ach;
+                                bestmoveindex[i][1] = bch;
+                            }
+                        }
+                    }
+                    else if ((deskinfo[a + 1][b + 1] == 2 || deskinfo[a + 1][b + 1] == 4) && b + 2 < 8) {
+                        ach = a + 2;
+                        bch = b + 2;
+                        if (deskinfo[ach + 1][bch + 1] == 0 && ((deskinfo[ach + 1][bch - 1] == 2 || deskinfo[ach + 1][bch - 1] == 4) && (deskinfo[ach - 1][bch + 1] == 1 || deskinfo[ach - 1][bch + 1] == 3)) || (deskinfo[ach + 1][bch - 1] == 0 || deskinfo[ach + 1][bch - 1] == 1 || deskinfo[ach + 1][bch - 1] == 3)) {
+                            if (teamchance[i] < 95) {
+                                teamchance[i] = 95;
+                                bestmoveindex[i][0] = ach;
+                                bestmoveindex[i][1] = bch;
+                            }
+                        }
+                        else if ((deskinfo[ach + 1][bch + 1] == 2 || deskinfo[ach + 1][bch + 1] == 4) || ((deskinfo[ach + 1][bch - 1] == 2 || deskinfo[ach + 1][bch - 1] == 4) && deskinfo[ach - 1][bch + 1] == 0)) {
+                            if (teamchance[i] < 80) {
+                                teamchance[i] = 80;
+                                bestmoveindex[i][0] = ach;
+                                bestmoveindex[i][1] = bch;
+                            }
+                        }
+                        else if (ach + 1 == 8) {
+                            teamchance[i] = 100;
+                            bestmoveindex[i][0] = ach;
+                            bestmoveindex[i][1] = ach;
+                        }
+                    }
+                    else if ((deskinfo[a + 1][b - 1] == 2 || deskinfo[a + 1][b - 1] == 4) && b - 2 > -1) {
+                        ach = a + 2;
+                        bch = b - 2;
+                        if (deskinfo[ach + 1][bch - 1] == 0 && ((deskinfo[ach + 1][bch + 1] == 2 || deskinfo[ach + 1][bch + 1] == 4) && (deskinfo[ach - 1][bch - 1] == 1 || deskinfo[ach - 1][bch - 1] == 3)) || (deskinfo[ach + 1][bch + 1] == 0 || deskinfo[ach + 1][bch + 1] == 1 || deskinfo[ach + 1][bch + 1] == 3)) {
+                            if (teamchance[i] < 95) {
+                                teamchance[i] = 95;
+                                bestmoveindex[i][0] = ach;
+                                bestmoveindex[i][1] = bch;
+                            }
+                        }
+                        else if ((deskinfo[ach + 1][bch - 1] == 2 || deskinfo[ach + 1][bch - 1] == 4) || ((deskinfo[ach + 1][bch + 1] == 2 || deskinfo[ach + 1][bch + 1] == 4) && deskinfo[ach - 1][bch - 1] == 0)) {
+                            if (teamchance[i] < 80) {
+                                teamchance[i] = 80;
+                                bestmoveindex[i][0] = ach;
+                                bestmoveindex[i][1] = bch;
+                            }
+                        }
+                        else if (ach + 1 == 8) {
+                            teamchance[i] = 100;
+                            bestmoveindex[i][0] = ach;
+                            bestmoveindex[i][1] = ach;
+                        }
+                    }
                 }
             }
         }
